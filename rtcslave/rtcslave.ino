@@ -75,8 +75,9 @@ void sendTime(){
 
 
 
-void setup() {
+ void setup() {
   // put your setup code here, to run once:
+
   Serial.begin(9600);
   Wire.begin();
   analogReference(INTERNAL);
@@ -166,6 +167,7 @@ void loop() {
               Serial.write(EEPROM.read(M2L1+i));
           }
           Serial.println();
+          Serial.write(0x0D);
           m2L1millis = millis();
         }
     }
@@ -178,6 +180,7 @@ void loop() {
               Serial.write(EEPROM.read(M3L1+i));
           }
           Serial.println();
+          Serial.write(0x0D);
           m3L1millis = millis();
         }
     }
@@ -190,6 +193,7 @@ void loop() {
               Serial.write(EEPROM.read(M1L1+i));
           }
           Serial.println();
+          Serial.write(0x0D);
           m1L1millis = millis();
         }
     }
@@ -202,6 +206,7 @@ void loop() {
               Serial.write(EEPROM.read(M2L2+i));
           }
           Serial.println();
+          Serial.write(0x0D);
           m2L2millis = millis();
         }
     }
@@ -214,6 +219,7 @@ void loop() {
               Serial.write(EEPROM.read(M3L2+i));
           }
           Serial.println();
+          Serial.write(0x0D);
           m3L2millis = millis();
         }
     }
@@ -226,10 +232,10 @@ void loop() {
               Serial.write(EEPROM.read(M1L2+i));
           }
           Serial.println();
+          Serial.write(0x0D);
           m1L2millis = millis();
         }
     }
-    
 }
 
 
@@ -372,7 +378,7 @@ while (Serial.available()) {
           Serial.println(F("Font changed,requires reset"));
           
       }else if(txtMsg.charAt(0) == 'r' and txtMsg.charAt(1) == '1' and txtMsg.charAt(2) == '1'){
-          Serial.print(F("Message one line one,time:"));Serial.println(EEPROM.read(TADDM1L1));
+          Serial.print(F("Message one line one, time:"));Serial.println(EEPROM.read(TADDM1L1));
           uint8_t x = EEPROM.read(ADDM1L1);
           for(uint8_t i = 0;i<x;i++){
               Serial.write(EEPROM.read(M1L1+i));
@@ -380,7 +386,7 @@ while (Serial.available()) {
           Serial.println();          
           
       }else if(txtMsg.charAt(0) == 'r' and txtMsg.charAt(1) == '2' and txtMsg.charAt(2) == '1'){
-          Serial.print(F("Message two line one,time:"));Serial.println(EEPROM.read(TADDM2L1));
+          Serial.print(F("Message two line one, time:"));Serial.println(EEPROM.read(TADDM2L1));
           uint8_t x = EEPROM.read(ADDM2L1);
           for(uint8_t i = 0;i<x;i++){
               Serial.write(EEPROM.read(M2L1+i));
@@ -388,7 +394,7 @@ while (Serial.available()) {
           Serial.println();      
           
       }else if(txtMsg.charAt(0) == 'r' and txtMsg.charAt(1) == '3' and txtMsg.charAt(2) == '1'){
-          Serial.print(F("Message three line one,time:"));Serial.println(EEPROM.read(TADDM3L1));
+          Serial.print(F("Message three line one, time:"));Serial.println(EEPROM.read(TADDM3L1));
           uint8_t x = EEPROM.read(ADDM3L1);
           for(uint8_t i = 0;i<x;i++){
               Serial.write(EEPROM.read(M3L1+i));
@@ -396,25 +402,33 @@ while (Serial.available()) {
           Serial.println();          
           
       }else if(txtMsg.charAt(0) == 'r' and txtMsg.charAt(1) == '1' and txtMsg.charAt(2) == '2'){
-          Serial.print(F("Message one line two,time:"));Serial.println(EEPROM.read(TADDM1L2));
+          Serial.print(F("Message one line two, time:"));Serial.println(EEPROM.read(TADDM1L2));
           uint8_t x = EEPROM.read(ADDM1L2);
           for(uint8_t i = 0;i<x;i++){
               Serial.write(EEPROM.read(M1L2+i));
           }
           Serial.println();          
       }else if(txtMsg.charAt(0) == 'r' and txtMsg.charAt(1) == '2' and txtMsg.charAt(2) == '2'){
-          Serial.print(F("Message two line two,time:"));Serial.println(EEPROM.read(TADDM2L2));
+          Serial.print(F("Message two line two, time:"));Serial.println(EEPROM.read(TADDM2L2));
           uint8_t x = EEPROM.read(ADDM2L2);
           for(uint8_t i = 0;i<x;i++){
               Serial.write(EEPROM.read(M2L2+i));
           }
           Serial.println();          
       }else if(txtMsg.charAt(0) == 'r' and txtMsg.charAt(1) == '3' and txtMsg.charAt(2) == '2'){
-          Serial.print(F("Message three line two,time:"));Serial.println(EEPROM.read(TADDM3L2));
+          Serial.print(F("Message three line two, time:"));Serial.println(EEPROM.read(TADDM3L2));
           uint8_t x = EEPROM.read(ADDM3L2);
           for(uint8_t i = 0;i<x;i++){
               Serial.write(EEPROM.read(M3L2+i));
           }
+          Serial.println();          
+      }else if(txtMsg.charAt(0) == '@' and txtMsg.charAt(3) == '@'){
+          Serial.println(F("Time adjusted to"));
+          uint8_t hours = (txtMsg.charAt(1)-48)*10+txtMsg.charAt(2)-48;
+          uint8_t minutes = (txtMsg.charAt(4)-48)*10+txtMsg.charAt(5)-48;
+          Serial.print(hours);
+          Serial.print(":");Serial.print(minutes);
+          rtc.adjust(DateTime(2016,1,1,hours,minutes,0));
           Serial.println();          
       }
 

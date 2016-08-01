@@ -388,7 +388,7 @@ void serialEvent() {
   while (Serial.available()) {
     char inChar = (char)Serial.read();
     txtMsg += inChar;
-    if (inChar == '\n') {
+    if (inChar == '\n' or inChar == '\r') {
       /*****************SETTING FOR MESSAGE 1******************************/
       if(txtMsg.charAt(0) == '1'){
           msg1size = txtMsg.length()-2;
@@ -453,6 +453,7 @@ void serialEvent() {
         
         ///////////////EMPTYIING THE BUFFER//////////////////////////
         txtMsg = "";
+        Serial.flush();
         }//END OF ONE LINE
     }//END OF SERIAL AVAILABLE
      Timer1.attachInterrupt( ScanDMD );
