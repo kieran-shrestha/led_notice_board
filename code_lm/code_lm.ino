@@ -1,4 +1,4 @@
-#define DEBUG 1
+#define DEBUG 0
 
 /*1 for message 1
 2 for message 2
@@ -364,8 +364,8 @@ void loop() {
    thread1(&pt1,10000);    //temp
    thread2(&pt2,10000);    //time
    thread3(&pt3,100);      //banner
-   thread4(&pt4,1);       //msg1
-   thread5(&pt5,1);      //msg2
+   thread4(&pt4,msg1time);       //msg1
+   thread5(&pt5,msg2time);      //msg2
 
 /************FUNCTION TO BLINK THE COLON EVERY 1 SEC********************************
 *************AND TO INCREASE THE TIME FOR ANALOG CLOCK******************************
@@ -393,31 +393,38 @@ void serialEvent() {
       if(txtMsg.charAt(0) == '1'){
           msg1size = txtMsg.length()-2;
           if(msg1size > MSG1LIMIT ){
-             // Serial.print(F("Message 1 exceeds "));Serial.print(MSG1LIMIT);Serial.println(F(" characters, will be truncated.."));
+             #if(DEBUG == 1)
+              Serial.print(F("Message 1 exceeds "));Serial.print(MSG1LIMIT);Serial.println(F(" characters, will be truncated.."));
+              #endif;
               msg1size = MSG1LIMIT;
           }
           EEPROM.write(MSG1LENADD,msg1size);
           for( x = 0;x<msg1size;x++)
               EEPROM.write(x+MSG1START,txtMsg.charAt(x+1));
-          //Serial.print(F("Message 1 successfully updated of characters: "));
-          //Serial.println(msg1size);
+          #if(DEBUG == 1)    
+          Serial.print(F("Message 1 successfully updated of characters: "));
+          Serial.println(msg1size);
+          #endif;
           for( x  = 0;x<msg1size;x++){
              msg1[x]=EEPROM.read(MSG1START+x);
           }
-        
        }
        /**************************SETTING FOR MESSAGE 2 ******************************/
        else if(txtMsg.charAt(0) == '2'){
           msg2size = txtMsg.length()-2;
           if(msg2size > MSG2LIMIT ){
-              //Serial.print(F("Message 2 exceeds "));Serial.print(MSG2LIMIT);Serial.println(F(" characters, will be truncated.."));
+              #if(DEBUG == 1)
+              Serial.print(F("Message 2 exceeds "));Serial.print(MSG2LIMIT);Serial.println(F(" characters, will be truncated.."));
+              #endif;
               msg2size = MSG2LIMIT;
           }
           EEPROM.write(MSG2LENADD,msg2size);
           for(x = 0;x<msg2size;x++)
               EEPROM.write(x+MSG2START,txtMsg.charAt(x+1));
-          //Serial.print(F("Message 2 successfully updated of characters: "));
-          //Serial.println(msg2size);
+          #if(DEBUG == 1)
+          Serial.print(F("Message 2 successfully updated of characters: "));
+          Serial.println(msg2size);
+          #endif;
           for( x  = 0;x<msg2size;x++){
              msg2[x]=EEPROM.read(MSG2START+x);
             }

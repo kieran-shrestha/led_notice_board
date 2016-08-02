@@ -43,13 +43,26 @@ unsigned char msg1Line2time = 0,msg2Line2time=0,msg3Line2time=0;
 
 String txtMsg = "";
 
+unsigned int temparr[50];
 
 void sendTemp(){
-  unsigned char temp=25;
-  temp = char( (110.0/1024)*analogRead(TEMPSENSOR));
-  Serial.print('t');
-  Serial.print(temp/10);
-  Serial.println(temp%10); 
+  static char count = 0;
+  unsigned int temp=25;
+  temp = int( (110.0/1024)*analogRead(TEMPSENSOR));
+  temparr[count] = temp;
+  count++;
+  if(count == 49){
+    count = 0;
+    for(int i = 0;i<50;i++){
+        temp += temparr[i];
+    }
+    temp = int(temp/50.0);
+    Serial.println();
+    Serial.print('t');
+    Serial.print(temp/10);
+    Serial.println(temp%10); 
+    Serial.println();
+  } 
 }
 
 
@@ -146,7 +159,7 @@ void sendTime(){
 
 unsigned long m1L1millis=0,m2L1millis=0,m3L1millis=0;
 unsigned long m1L2millis=0,m2L2millis=0,m3L2millis=0;
-unsigned long timemillis = 0;
+unsigned long timemillis = 0,tempmillis=0;
 
 int lastMsgSent = 11;
 int lastMsgSent2 = 12;
@@ -154,9 +167,14 @@ unsigned long timer = 0;
 
 void loop() {
    if(millis() - timemillis > 5000){
+     Serial.println();
      sendTime();
-     sendTemp();
+     Serial.println();
      timemillis = millis();
+   }
+   if(millis() - tempmillis > 250){
+     sendTemp();
+     tempmillis = millis();
    }
   
    if(lastMsgSent == 11 ){
@@ -167,7 +185,7 @@ void loop() {
               Serial.write(EEPROM.read(M2L1+i));
           }
           Serial.println();
-          Serial.write(0x0D);
+          Serial.write(0x0A);
           m2L1millis = millis();
         }
     }
@@ -180,7 +198,7 @@ void loop() {
               Serial.write(EEPROM.read(M3L1+i));
           }
           Serial.println();
-          Serial.write(0x0D);
+          Serial.write(0x0A);
           m3L1millis = millis();
         }
     }
@@ -193,7 +211,7 @@ void loop() {
               Serial.write(EEPROM.read(M1L1+i));
           }
           Serial.println();
-          Serial.write(0x0D);
+          Serial.write(0x0A);
           m1L1millis = millis();
         }
     }
@@ -206,7 +224,7 @@ void loop() {
               Serial.write(EEPROM.read(M2L2+i));
           }
           Serial.println();
-          Serial.write(0x0D);
+          Serial.write(0x0A);
           m2L2millis = millis();
         }
     }
@@ -219,7 +237,7 @@ void loop() {
               Serial.write(EEPROM.read(M3L2+i));
           }
           Serial.println();
-          Serial.write(0x0D);
+          Serial.write(0x0A);
           m3L2millis = millis();
         }
     }
@@ -232,7 +250,7 @@ void loop() {
               Serial.write(EEPROM.read(M1L2+i));
           }
           Serial.println();
-          Serial.write(0x0D);
+          Serial.write(0x0A);
           m1L2millis = millis();
         }
     }
@@ -246,7 +264,8 @@ while (Serial.available()) {
     if (inChar == '\n') {
       //M1L1TT
       if(txtMsg.charAt(1) == '1' and txtMsg.charAt(3) == '1'){
-          msg1Line1size = txtMsg.length()-5;
+          msg1Line1size = txtMsg.length()-7;
+          Serial.println(msg1Line1size);
           if(msg1Line1size > MSGLIMIT ){
               Serial.print(F("Message exceeds "));Serial.print(MSGLIMIT);Serial.println(F(" characters, will be truncated.."));
               msg1Line1size = MSGLIMIT;
@@ -264,7 +283,7 @@ while (Serial.available()) {
           Serial.print(F("Time inverval of "));Serial.print(msg1Line1time);Serial.println(" mins");
      
     }  else if(txtMsg.charAt(1) == '2' and txtMsg.charAt(3) == '1'){
-          msg2Line1size = txtMsg.length()-5;
+          msg2Line1size = txtMsg.length()-7;
           if(msg2Line1size > MSGLIMIT ){
               Serial.print(F("Message exceeds "));Serial.print(MSGLIMIT);Serial.println(F(" characters, will be truncated.."));
               msg2Line1size = MSGLIMIT;
@@ -283,7 +302,7 @@ while (Serial.available()) {
           Serial.print(F("Time inverval of "));Serial.print(msg2Line1time);Serial.println(" mins");
           
     } else if(txtMsg.charAt(1) == '3' and txtMsg.charAt(3) == '1'){
-          msg3Line1size = txtMsg.length()-5;
+          msg3Line1size = txtMsg.length()-7;
           if(msg3Line1size > MSGLIMIT ){
               Serial.print(F("Message exceeds "));Serial.print(MSGLIMIT);Serial.println(F(" characters, will be truncated.."));
               msg3Line1size = MSGLIMIT;
@@ -302,7 +321,7 @@ while (Serial.available()) {
           Serial.print(F("Time inverval of "));Serial.print(msg3Line1time);Serial.println(" mins");
           
       } else if(txtMsg.charAt(1) == '1' and txtMsg.charAt(3) == '2'){
-          msg1Line2size = txtMsg.length()-5;
+          msg1Line2size = txtMsg.length()-7;
           if(msg1Line2size > MSGLIMIT ){
               Serial.print(F("Message exceeds "));Serial.print(MSGLIMIT);Serial.println(F(" characters, will be truncated.."));
               msg1Line2size = MSGLIMIT;
@@ -320,7 +339,7 @@ while (Serial.available()) {
           Serial.print(F("Time inverval of "));Serial.print(msg1Line2time);Serial.println(" mins");
           
       } else if(txtMsg.charAt(1) == '2' and txtMsg.charAt(3) == '2'){
-          msg2Line2size = txtMsg.length()-5;
+          msg2Line2size = txtMsg.length()-7;
           if(msg2Line2size > MSGLIMIT ){
               Serial.print(F("Message exceeds "));Serial.print(MSGLIMIT);Serial.println(F(" characters, will be truncated.."));
               msg2Line2size = MSGLIMIT;
@@ -339,7 +358,7 @@ while (Serial.available()) {
           Serial.print(F("Time inverval of "));Serial.print(msg2Line2time);Serial.println(" mins");
           
       }else if(txtMsg.charAt(1) == '3' and txtMsg.charAt(3) == '2'){
-          msg3Line2size = txtMsg.length()-5;
+          msg3Line2size = txtMsg.length()-7;
           if(msg3Line2size > MSGLIMIT ){
               Serial.print(F("Message exceeds "));Serial.print(MSGLIMIT);Serial.println(F(" characters, will be truncated.."));
               msg3Line2size = MSGLIMIT;
